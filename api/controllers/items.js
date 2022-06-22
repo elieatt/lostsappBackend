@@ -7,8 +7,8 @@ const Decon= require("../../uploads/deleteController");
 
 exports.itemsGetItems = (req, res, next) => {
     Item.find()
-        .select("_id title description imageUrl dateOfLoose found user")
-        .populate("user", "_id email")
+        .select("_id title description imageUrl dateOfLoose found category governorate user")
+        .populate("user", "_id email phoneNumber")
         .exec()
         .then(docs => {
             const items = docs.map((doc) => {
@@ -20,6 +20,8 @@ exports.itemsGetItems = (req, res, next) => {
                     imageUrl: doc.imageUrl,
                     dateOfLoose: doc.dateOfLoose.toISOString(),
                     found: doc.found,
+                    category:doc.category,
+                    governorate:doc.governorate,
                     user: doc.user,
                     request: {
                         type: "GET",
@@ -42,10 +44,10 @@ exports.itemsGetItems = (req, res, next) => {
 
 
 exports.itemsGetOneItem = (req, res, next) => {
-    console.log("here");
+    //console.log("here");
     Item.findById(req.params.itemId)
-        .select("_id title description imageUrl dateOfLoose found user")
-        .populate("user", "_id email")
+        .select("_id title description imageUrl dateOfLoose found category governorate user")
+        .populate("user", "_id email phoneNumber")
         .exec()
         .then(doc => {
             if (!doc) {
@@ -70,6 +72,8 @@ exports.itemsCreateItem = (req, res, next) => {
         description: req.body.description,
         imageUrl: `${process.env.DOMAIN}/${req.file.path}`.replace(/\\/g, "/"),
         found: req.body.found,
+        category:req.body.category,
+        governorate:req.body.governorate,
         user: req.userData._id
     });
 
@@ -86,7 +90,7 @@ exports.itemsCreateItem = (req, res, next) => {
         })
         .catch(err => {
             console.log(err);
-            json.status(500).json({
+            res.status(500).json({
                 error: err
             });
         });

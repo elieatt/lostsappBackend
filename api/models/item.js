@@ -7,6 +7,8 @@ const itemSchema = mongoose.Schema({
     imageUrl: String,
     dateOfLoose: { type: Date, default: new Date() },
     found:{type:Number,required:true},
+    governorate:{type:String,required:true},
+    category:{type:String,required:true},
     user: {
         ref: "User",
         type: mongoose.Schema.Types.ObjectId,

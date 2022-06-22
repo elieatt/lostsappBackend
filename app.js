@@ -2,16 +2,23 @@ const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const bodyparser = require("body-parser");
+const auth_check = require("./api/middlewares/auth_check");
 const itemsRoutes = require(`${__dirname}/api/routes/items`);
 const usersRoutes = require(`${__dirname}/api/routes/users`)
+const messagesRoutes=require(`${__dirname}/api/routes/messages`);
 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const mongodbURL = `mongodb+srv://e111:${encodeURIComponent(process.env.MONGOPASS)}@cluster0.qd1fh.mongodb.net/itemsgroup?retryWrites=true&w=majority`
 
-
-mongoose.connect(mongodbURL);
+mongoose.connect(mongodbURL,(error)=>{
+    if(error){
+        console.log(error);
+    }else{
+    console.log("connected to db");}
+    
+});
 
 
 app.use(morgan("dev"));
@@ -35,6 +42,7 @@ app.use("/uploads", express.static(`${__dirname}/uploads`));
 
 app.use("/items", itemsRoutes);
 app.use("/users", usersRoutes);
+app.use("/messages",auth_check,messagesRoutes);
 
 
 app.use((req, res, next) => {

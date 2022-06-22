@@ -29,15 +29,15 @@ const upload = multer({
 });
 
 
-router.get("/", ItemsControllers.itemsGetItems);
+router.get("/",ItemsControllers.itemsGetItems);
 
-router.get("/:itemId", ItemsControllers.itemsGetOneItem);
+router.get("/:itemId", checkAuth,ItemsControllers.itemsGetOneItem);
 
 router.post("/", checkAuth, upload.single("itemImage"), ItemsControllers.itemsCreateItem);
 
-router.patch("/:itemId", ItemsControllers.itemsUpdateItem);
+router.patch("/:itemId", checkAuth,ItemsControllers.itemsUpdateItem);
 
-router.delete("/:itemId", ItemsControllers.itemsDeleteItem);
+router.delete("/:itemId", checkAuth,ItemsControllers.itemsDeleteItem);
 
 
 

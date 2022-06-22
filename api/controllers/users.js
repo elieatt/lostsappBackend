@@ -23,7 +23,8 @@ exports.usersSignup = (req, res, next) => {
                     const user = new User({
                         _id: mongoose.Types.ObjectId(),
                         email: req.body.email,
-                        password: hash
+                        password: hash,
+                        phoneNumber:req.body.phoneNumber
                     });
                     user.save()
                         .then(result => {
@@ -58,18 +59,19 @@ exports.usersLogin = (req, res, next) => {
         .exec()
         .then(user => {
             if (!user) {
-                return res.status(401).json({ message: "auth failed" });
+                return res.status(401).json({ message: "Password or Email is incorrect" });
             }
             else {
                 bcrypt.compare(req.body.password, user.password, (err, result) => {
                     if (err || !result) {
                         console.log(err);
-                        res.status(401).json({ message: "auth failed" });
+                        res.status(401).json({ message: "Password or Email is incorrect" });
                     }
                     else {
                         jwt.sign({
                             email: user.email,
-                            _id: user._id
+                            _id: user._id,
+                            phoneNumber:user.phoneNumber
                         }, process.env.JWTPRIVATE, { expiresIn: "2d" }, (err, token) => {
                             if (err) {
                                 console.log(err);
@@ -78,7 +80,13 @@ exports.usersLogin = (req, res, next) => {
                             else {
                                 res.status(200).json({
                                     message: "auth succeded",
-                                    token: token
+                                    
+                                    user:{
+                                        id:user._id,
+                                        email:user.email,
+                                        phoneNumber:user.phoneNumber,
+                                        token:token
+                                    }
                                 });
                             }
                         });
