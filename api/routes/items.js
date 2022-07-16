@@ -15,6 +15,7 @@ const storage = multer.diskStorage({
     }
 });
 const fileFilter = (req, file, cb) => {
+    
     if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
         cb(null, true);
     }
@@ -29,15 +30,17 @@ const upload = multer({
 });
 
 
-router.get("/",ItemsControllers.itemsGetItems);
+router.get("/", ItemsControllers.itemsGetItems);
 
-router.get("/:itemId", checkAuth,ItemsControllers.itemsGetOneItem);
+router.get("/:itemId", checkAuth, ItemsControllers.itemsGetOneItem);
 
 router.post("/", checkAuth, upload.single("itemImage"), ItemsControllers.itemsCreateItem);
 
-router.patch("/:itemId", checkAuth,ItemsControllers.itemsUpdateItem);
+router.post("/noImage",checkAuth,ItemsControllers.itemsCreateItemNoImage);
 
-router.delete("/:itemId", checkAuth,ItemsControllers.itemsDeleteItem);
+router.patch("/:itemId", checkAuth, ItemsControllers.itemsUpdateItem);
+
+router.delete("/:itemId", ItemsControllers.itemsDeleteItem);
 
 
 

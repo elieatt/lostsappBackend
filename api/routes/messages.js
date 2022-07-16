@@ -9,6 +9,8 @@ const messagesController = require('../controllers/messages');
 
 router.get("/recivedMessages/:reciverId", messagesController.reciveMessage);
 
+router.get("/getSentMessages/:senderId",messagesController.getSentMessages);
+
 router.post("/sendMessage/:reciverId", messagesController.sendMessage);
 
 router.delete("/:mesageId", messagesController.deleteMessage);

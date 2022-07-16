@@ -8,7 +8,7 @@ const bcrypt = require("bcryptjs");
 exports.usersSignup = (req, res, next) => {
     User.findOne({ email: req.body.email }).exec()
         .then(doc => {
-            console.log(doc);
+            //console.log(doc);
             if (doc) {
                 return res.status(409).json({ message: "email already exists" });
             }
@@ -24,7 +24,8 @@ exports.usersSignup = (req, res, next) => {
                         _id: mongoose.Types.ObjectId(),
                         email: req.body.email,
                         password: hash,
-                        phoneNumber:req.body.phoneNumber
+                        phoneNumber:req.body.phoneNumber,
+                        userName:req.body.userName,
                     });
                     user.save()
                         .then(result => {
@@ -32,7 +33,8 @@ exports.usersSignup = (req, res, next) => {
                                 message: "User was created"
                                 , user: {
                                     email: user.email,
-                                    _id: user._id
+                                    _id: user._id,
+                                    phoneNumber:user.phoneNumber
                                 }
                             });
                         })
@@ -85,6 +87,7 @@ exports.usersLogin = (req, res, next) => {
                                         id:user._id,
                                         email:user.email,
                                         phoneNumber:user.phoneNumber,
+                                         userName:user.userName,
                                         token:token
                                     }
                                 });

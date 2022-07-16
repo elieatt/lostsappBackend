@@ -5,7 +5,7 @@ const itemSchema = mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
     imageUrl: String,
-    dateOfLoose: { type: Date, default: new Date() },
+    dateOfLoose: { type: String ,required:true },
     found:{type:Number,required:true},
     governorate:{type:String,required:true},
     category:{type:String,required:true},
