@@ -13,6 +13,8 @@ router.get("/getSentMessages/:senderId",messagesController.getSentMessages);
 
 router.post("/sendMessage/:reciverId", messagesController.sendMessage);
 
+router.put("/readAmessage/:messageId",messagesController.readMessage);
+
 router.delete("/:mesageId", messagesController.deleteMessage);
 
 module.exports = router;

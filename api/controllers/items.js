@@ -168,7 +168,7 @@ exports.itemsDeleteItem = async (req, res, next) => {
                     fs.unlinkSync(path.join("uploads", imagePath));
                 }
 
-                res.status(200).json({
+                res.status(201).json({
                     message: "deleted successfully"
                 });
             })

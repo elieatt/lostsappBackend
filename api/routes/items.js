@@ -40,7 +40,7 @@ router.post("/noImage",checkAuth,ItemsControllers.itemsCreateItemNoImage);
 
 router.patch("/:itemId", checkAuth, ItemsControllers.itemsUpdateItem);
 
-router.delete("/:itemId", ItemsControllers.itemsDeleteItem);
+router.delete("/:itemId",checkAuth, ItemsControllers.itemsDeleteItem);
 
 
 

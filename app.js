@@ -46,7 +46,8 @@ app.use("/messages",auth_check,messagesRoutes);
 
 
 app.use((req, res, next) => {
-    const error = new Error({ message: "NOT FOUND" });
+    const error = new Error();
+    error.message ="NOT FOUND";
     error.status = 404;
     next(error);
 });

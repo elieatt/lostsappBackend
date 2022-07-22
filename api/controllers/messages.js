@@ -35,7 +35,7 @@ exports.sendMessage = async (req, res, next) => {
 
 exports.reciveMessage = (req, res, next) => {
     Message.find({ reciver: req.params.reciverId })
-        .select("_id sender reciver item messageText")
+        .select("_id sender reciver item messageText read")
         .populate("item")
         .populate("reciver", '_id email phoneNumber userName')
         .populate("sender", '_id email phoneNumber userName')
@@ -46,12 +46,13 @@ exports.reciveMessage = (req, res, next) => {
             }
             const messages = docs.reverse().map((doc) => {
                 let iitem = doc.item;
-                iitem.user=doc.reciver
+                iitem.user = doc.reciver
                 return {
                     id: doc._id,
                     messageText: doc.messageText,
                     sender: doc.sender,
                     reciver: doc.reciver,
+                    read: doc.read,
                     item: iitem
 
                 }
@@ -68,7 +69,7 @@ exports.getSentMessages = (req, res, next) => {
 
 
     Message.find({ sender: req.params.senderId })
-        .select("_id reciver sender item messageText")
+        .select("_id reciver sender item messageText read")
         .populate("item")
         .populate("reciver", '_id email phoneNumber userName')
         .populate("sender", '_id email phoneNumber userName')
@@ -80,12 +81,13 @@ exports.getSentMessages = (req, res, next) => {
             }
             const messages = docs.reverse().map((doc) => {
                 let iitem = doc.item;
-                iitem.user=doc.reciver
+                iitem.user = doc.reciver
                 return {
                     id: doc._id,
                     messageText: doc.messageText,
                     sender: doc.sender,
                     item: iitem,
+                    read: doc.read,
                     reciver: doc.reciver
 
                 }
@@ -98,11 +100,39 @@ exports.getSentMessages = (req, res, next) => {
             res.status(500).json({ error: err });
         })
 };
+exports.readMessage = async (req, res, next) => {
+    console.log(req.params.messageId);
+    queryResult = await Message.findById(req.params.messageId).exec();
+    console.log(queryResult);
+    if (queryResult.reciver != req.userData._id) {
+        res.status(404).json({
+            error: "unauthorized"
+        });
+        return;
+    }
+    Message.updateOne({ _id: req.params.messageId }, { read: true })
+        .exec()
+        .then(value => {
+            res.status(201).json({ message: "updated successfully" });
+
+        }).catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+
+
+
+}
+
+
+
 exports.deleteMessage = (req, res, next) => {
     Message.deleteOne({ _id: req.params.mesageId }).exec().then(result => {
-        res.status(200).json({ message: "deleted successfully" }).catch(err => {
-            console.log(err);
-            res.status(500).json({ error: err });
-        })
-    })
+        res.status(201).json({ message: "deleted successfully" });
+    }).catch(err => {
+        console.log(err);
+        res.status(500).json({ error: err });
+    });
 };

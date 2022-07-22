@@ -16,6 +16,11 @@ const messageSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    messageText: { type: String, required: true }
+    messageText: {
+        type: String, required: true
+    },
+    read: {
+        type: Boolean, default: false
+    }
 });
 module.exports = mongoose.model("Message", messageSchema);
