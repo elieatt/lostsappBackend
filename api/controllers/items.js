@@ -1,9 +1,21 @@
+const cloudinary = require('cloudinary')
+cloudinary.config({
+    cloud_name: env.process.CLOUDNAME,
+    api_key: env.process.CLOUDINARYAPIKEY,
+    api_secret: env.process.CLOUDINARYSECRETAPIKEY,
+    secure: true
+
+});
+
+
 const { default: mongoose } = require("mongoose");
 const Item = require("../models/item");
-const fs = require("fs");
+
 const Message = require("../models/message");
 
+
 const path = require("path");
+const { env } = require('process');
 
 
 
@@ -67,19 +79,25 @@ exports.itemsGetOneItem = (req, res, next) => {
 }
 
 
-exports.itemsCreateItem = (req, res, next) => {
+exports.itemsCreateItem = async (req, res, next) => {
 
-    console.log(req.file.path);
+    /* console.log(req.file.path); */
+    let cloudinaryUploadResult = await cloudinary.uploader.upload(req.file.path);
+    if (!cloudinaryUploadResult) {
+        res.status(500).json({ error: "Interal sever error" });
+        return;
+    }
     const item = new Item({
         _id: mongoose.Types.ObjectId(),
         title: req.body.title,
         description: req.body.description,
-        imageUrl: `${process.env.DOMAIN}/${req.file.path}`.replace(/\\/g, "/"),
+        imageUrl: /* `${process.env.DOMAIN}/${req.file.path}`.replace(/\\/g, "/") */cloudinaryUploadResult.secure_url,
         dateOfLoose: req.body.dateOfLoose,
         found: req.body.found,
         category: req.body.category,
         governorate: req.body.governorate,
-        user: req.userData._id
+        user: req.userData._id,
+        imagePublicId: cloudinaryUploadResult.public_id
     });
 
     item.save()
@@ -157,26 +175,29 @@ exports.itemsUpdateItem = (req, res, next) => {
 exports.itemsDeleteItem = async (req, res, next) => {
     var imagePath;
 
-    Item.findById(req.params.itemId).exec().then(async doc => {
-        imagePath = doc.imageUrl.split(`${process.env.DOMAIN}/uploads/`)[1];
-        console.log(imagePath);
-        let del = await Message.deleteMany({ item: req.params.itemId });
-        Item.deleteOne({ _id: req.params.itemId })
-            .exec()
-            .then(result => {
-                if (imagePath != "NOIMAGE.jpg") {
-                    fs.unlinkSync(path.join("uploads", imagePath));
-                }
+    Item.findById(req.params.itemId)
+        .exec()
+        .then(async doc => {
+            imagePath = doc.imageUrl;
+            console.log(imagePath);
+            let del = await Message.deleteMany({ item: req.params.itemId });
+            Item.deleteOne({ _id: req.params.itemId })
+                .exec()
+                .then(result => {//`${process.env.DOMAIN}/uploads/NOIMAGE.jpg`
+                    if (imagePath != `${process.env.DOMAIN}/uploads/NOIMAGE.jpg`) {
+                        cloudinary.v2.uploader.destroy(doc.imagePublicId, 'image');
+                    }
 
-                res.status(201).json({
-                    message: "deleted successfully"
-                });
-            })
+                    res.status(201).json({
+                        message: "deleted successfully"
+                    });
+                })
 
-    }).catch(err => {
-        console.log(err);
-        res.status(500).json({ error: err });
-    })
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: err });
+        })
 
 }
 //////////*******/ */

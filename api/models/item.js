@@ -13,7 +13,8 @@ const itemSchema = mongoose.Schema({
         ref: "User",
         type: mongoose.Schema.Types.ObjectId,
         required: true
-    }
+    },
+    imagePublicId:{type:String,required:false}
 });
 
 module.exports = mongoose.model("Item", itemSchema);
