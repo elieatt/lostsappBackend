@@ -15,7 +15,7 @@ const Message = require("../models/message");
 
 
 const path = require("path");
-const { env } = require('process');
+
 
 
 
@@ -157,6 +157,10 @@ exports.itemsCreateItemNoImage = (req, res, next) => {
 
 
 exports.itemsUpdateItem = (req, res, next) => {
+    if(req.body._id){
+        res.status(405).json({ error: "cant change id" });
+        return;
+    }
     Item.updateOne({ _id: req.params.itemId }, { $set: req.body })
         .exec()
         .then(result => {
@@ -200,4 +204,11 @@ exports.itemsDeleteItem = async (req, res, next) => {
         })
 
 }
+exports.deleteImages=(imagesArray=>{
+    for (image in imagesArray){
+        if (image.imageUrl!=`${process.env.DOMAIN}/uploads/NOIMAGE.jpg`) {
+            cloudinary.v2.uploader.destroy(image.imagePublicId, 'image');
+        }
+    }
+});
 //////////*******/ */
